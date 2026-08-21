@@ -101,6 +101,13 @@ const publicClientVisibilityCache = new Map<string, { value: boolean; expiresAt:
 let lastLoginRateLimitCleanupAt = 0;
 const loginFailureAuditThrottle = new Map<string, { expiresAt: number }>();
 
+const WORLD_MAP_SOURCE_URLS = [
+  'https://cdn.jsdelivr.net/gh/apache/echarts-www@master/asset/map/json/world.json',
+  'https://fastly.jsdelivr.net/gh/apache/echarts-www@master/asset/map/json/world.json',
+  'https://gcore.jsdelivr.net/gh/apache/echarts-www@master/asset/map/json/world.json',
+  'https://raw.githubusercontent.com/apache/echarts-www/master/asset/map/json/world.json',
+];
+
 // 仅返回 Cloudflare 推断的国家代码，不返回 IP；该接口用于 Emerald 地球视图的访客连线。
 publicRoutes.get('/visitor', (c) => {
   const requestWithCf = c.req.raw as Request & { cf?: unknown };
@@ -113,6 +120,27 @@ publicRoutes.get('/visitor', (c) => {
   const country = rawCountry.trim().toUpperCase();
   c.header('Cache-Control', 'no-store');
   return c.json({ country: /^[A-Z]{2}$/.test(country) ? country : null });
+});
+
+// 世界地图资源通过 Worker 同源转发，避免前端 CSP 的 connect-src 阻断外部 CDN。
+publicRoutes.get('/world-map', async () => {
+  for (const url of WORLD_MAP_SOURCE_URLS) {
+    try {
+      const upstream = await fetch(url);
+      if (!upstream.ok) continue;
+      const headers = new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+      });
+      return new Response(await upstream.arrayBuffer(), { status: 200, headers });
+    } catch {
+      // Try the next CDN mirror.
+    }
+  }
+  return new Response(JSON.stringify({ error: 'world map resource unavailable' }), {
+    status: 502,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+  });
 });
 
 async function timed<T>(metrics: TimingMetric[], name: string, fn: () => Promise<T>): Promise<T> {

@@ -47,6 +47,7 @@ interface OverviewMetrics {
 
 const WORLD_MAP_NAME = 'cf-vps-monitor-emerald-world';
 const WORLD_MAP_URLS = [
+  '/api/world-map',
   'https://cdn.jsdelivr.net/gh/apache/echarts-www@master/asset/map/json/world.json',
   'https://fastly.jsdelivr.net/gh/apache/echarts-www@master/asset/map/json/world.json',
   'https://gcore.jsdelivr.net/gh/apache/echarts-www@master/asset/map/json/world.json',
