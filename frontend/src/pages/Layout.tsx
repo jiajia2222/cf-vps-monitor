@@ -4,6 +4,7 @@ import { Text, IconButton, SegmentedControl } from "@radix-ui/themes";
 import { Settings, Sun, Moon, Laptop, Palette, Github } from "lucide-react";
 
 import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext";
 import { hasLocalDisplayThemePreference, useDisplayTheme } from "../contexts/DisplayThemeContext";
 import { displayThemeLabels, getNextDisplayTheme, normalizeDisplayTheme } from "../utils/displayTheme";
 import { CF_MONITOR_GITHUB_URL } from "../utils/projectLinks";
@@ -41,6 +42,7 @@ function safeLogoUrl(value: unknown) {
 
 export default function Layout() {
   const { theme, setTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
   const { displayTheme, setDisplayThemeFromSettings, toggleDisplayTheme } = useDisplayTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,6 +53,8 @@ export default function Layout() {
   const [bgUrlDesktop, setBgUrlDesktop] = useState("");
   const [bgUrlMobile, setBgUrlMobile] = useState("");
   const [mainContentWidth, setMainContentWidth] = useState(100);
+  const [disablePageAnimation, setDisablePageAnimation] = useState(false);
+  const [hideAdminEntryWhenLoggedOut, setHideAdminEntryWhenLoggedOut] = useState(false);
 
   useEffect(() => {
     const applyPublicSettings = () => {
@@ -71,6 +75,8 @@ export default function Layout() {
           setBgUrlMobile(safeBackgroundUrl(data.theme_settings.backgroundImageUrlMobile));
         if (data.theme_settings?.mainContentWidth)
           setMainContentWidth(data.theme_settings.mainContentWidth);
+        setDisablePageAnimation(data.disable_page_animation === "true");
+        setHideAdminEntryWhenLoggedOut(data.hide_admin_entry_when_logged_out === "true");
         if (!hasLocalDisplayThemePreference()) {
           setDisplayThemeFromSettings(normalizeDisplayTheme(data.active_theme));
         }
@@ -119,7 +125,7 @@ export default function Layout() {
 
   return (
     <div
-      className={bgUrl ? "layout bg-cover bg-center bg-fixed bg-no-repeat" : "layout"}
+      className={`${bgUrl ? "layout bg-cover bg-center bg-fixed bg-no-repeat" : "layout"}${disablePageAnimation ? " disable-page-animation" : ""}`}
       style={{ backgroundImage: bgUrl ? `url(${JSON.stringify(bgUrl)})` : "none", backgroundColor: bgUrl ? "transparent" : "var(--accent-1)" }}
     >
       <main
@@ -183,7 +189,7 @@ export default function Layout() {
               {themeIcon}
             </IconButton>
 
-            <IconButton
+            {(!hideAdminEntryWhenLoggedOut || isAuthenticated) && <IconButton
               className="nav-icon-button"
               variant="soft"
               size="2"
@@ -192,7 +198,7 @@ export default function Layout() {
               title="进入后台"
             >
               <Settings size={18} />
-            </IconButton>
+            </IconButton>}
           </div>
         </nav>
 

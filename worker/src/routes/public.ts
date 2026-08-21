@@ -101,6 +101,20 @@ const publicClientVisibilityCache = new Map<string, { value: boolean; expiresAt:
 let lastLoginRateLimitCleanupAt = 0;
 const loginFailureAuditThrottle = new Map<string, { expiresAt: number }>();
 
+// 仅返回 Cloudflare 推断的国家代码，不返回 IP；该接口用于 Emerald 地球视图的访客连线。
+publicRoutes.get('/visitor', (c) => {
+  const requestWithCf = c.req.raw as Request & { cf?: unknown };
+  const cf = requestWithCf.cf && typeof requestWithCf.cf === 'object'
+    ? requestWithCf.cf as { country?: unknown }
+    : null;
+  const rawCountry = typeof cf?.country === 'string'
+    ? cf.country
+    : c.req.header('CF-IPCountry') || '';
+  const country = rawCountry.trim().toUpperCase();
+  c.header('Cache-Control', 'no-store');
+  return c.json({ country: /^[A-Z]{2}$/.test(country) ? country : null });
+});
+
 async function timed<T>(metrics: TimingMetric[], name: string, fn: () => Promise<T>): Promise<T> {
   const started = performance.now();
   try {

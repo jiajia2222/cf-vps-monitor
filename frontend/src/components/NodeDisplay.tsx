@@ -25,6 +25,7 @@ interface NodeDisplayProps {
   gridRenderer: (nodes: ClientInfo[], liveData: LiveDataMap) => React.ReactNode;
   offlinePosition?: 'first' | 'keep' | 'last';
   includeHidden?: boolean;
+  defaultViewMode?: string;
 }
 
 export default function NodeDisplay({
@@ -33,9 +34,12 @@ export default function NodeDisplay({
   gridRenderer,
   offlinePosition = 'keep',
   includeHidden = false,
+  defaultViewMode,
 }: NodeDisplayProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
-    return getLocalStorageItem('nodeViewMode') === 'table' ? 'table' : 'grid';
+    const saved = getLocalStorageItem('nodeViewMode');
+    if (saved === 'table' || saved === 'grid') return saved;
+    return defaultViewMode === 'table' ? 'table' : 'grid';
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('all');
@@ -43,6 +47,11 @@ export default function NodeDisplay({
   const searchRef = useRef<HTMLDivElement>(null);
 
   const groups = useMemo(() => getNodeGroups(nodes), [nodes]);
+
+  useEffect(() => {
+    if (getLocalStorageItem('nodeViewMode')) return;
+    setViewMode(defaultViewMode === 'table' ? 'table' : 'grid');
+  }, [defaultViewMode]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

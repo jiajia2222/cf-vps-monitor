@@ -15,6 +15,15 @@ export interface PublicSettings {
   language: string;
   script_domain: string;
   site_logo_url: string;
+  default_view_mode: string;
+  hide_admin_entry_when_logged_out: string;
+  alert_enabled: string;
+  alert_title: string;
+  alert_content: string;
+  earth_view_mode: string;
+  visitor_info_card_enabled: string;
+  offline_nodes_last: string;
+  disable_page_animation: string;
   ping_record_persist_interval_sec: string;
   live_poll_active_interval_sec: string;
   live_poll_idle_interval_sec: string;
@@ -30,6 +39,15 @@ const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
   language: 'zh-CN',
   script_domain: '',
   site_logo_url: '',
+  default_view_mode: 'grid',
+  hide_admin_entry_when_logged_out: 'false',
+  alert_enabled: 'false',
+  alert_title: '',
+  alert_content: '',
+  earth_view_mode: 'maps',
+  visitor_info_card_enabled: 'true',
+  offline_nodes_last: 'false',
+  disable_page_animation: 'false',
   ping_record_persist_interval_sec: '120',
   live_poll_active_interval_sec: '3',
   live_poll_idle_interval_sec: '120',
@@ -56,6 +74,20 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 function stringSetting(value: unknown, fallback: string, maxLength: number): string {
   const text = typeof value === 'string' ? value : fallback;
   return text.length <= maxLength ? text : fallback;
+}
+
+function booleanSetting(value: unknown, fallback: string): string {
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true' || normalized === '1') return 'true';
+    if (normalized === 'false' || normalized === '0') return 'false';
+  }
+  return fallback;
+}
+
+function enumSetting(value: unknown, fallback: string, values: readonly string[]): string {
+  return typeof value === 'string' && values.includes(value) ? value : fallback;
 }
 
 function integerSetting(value: unknown, fallback: number, min: number, max: number): number {
@@ -86,6 +118,19 @@ export function normalizePublicSettings(payload: unknown): PublicSettings | null
     language: stringSetting(record.language, DEFAULT_PUBLIC_SETTINGS.language, 32),
     script_domain: stringSetting(record.script_domain, DEFAULT_PUBLIC_SETTINGS.script_domain, 256),
     site_logo_url: stringSetting(record.site_logo_url, DEFAULT_PUBLIC_SETTINGS.site_logo_url, 256),
+    default_view_mode: enumSetting(record.default_view_mode, DEFAULT_PUBLIC_SETTINGS.default_view_mode, ['grid', 'table']),
+    hide_admin_entry_when_logged_out: booleanSetting(record.hide_admin_entry_when_logged_out, DEFAULT_PUBLIC_SETTINGS.hide_admin_entry_when_logged_out),
+    alert_enabled: booleanSetting(record.alert_enabled, DEFAULT_PUBLIC_SETTINGS.alert_enabled),
+    alert_title: stringSetting(record.alert_title, DEFAULT_PUBLIC_SETTINGS.alert_title, 128),
+    alert_content: stringSetting(record.alert_content, DEFAULT_PUBLIC_SETTINGS.alert_content, 8192),
+    earth_view_mode: enumSetting(
+      record.earth_view_mode,
+      DEFAULT_PUBLIC_SETTINGS.earth_view_mode,
+      ['earth', 'earth-stop', 'maps', 'cards', 'hide'],
+    ),
+    visitor_info_card_enabled: booleanSetting(record.visitor_info_card_enabled, DEFAULT_PUBLIC_SETTINGS.visitor_info_card_enabled),
+    offline_nodes_last: booleanSetting(record.offline_nodes_last, DEFAULT_PUBLIC_SETTINGS.offline_nodes_last),
+    disable_page_animation: booleanSetting(record.disable_page_animation, DEFAULT_PUBLIC_SETTINGS.disable_page_animation),
     ping_record_persist_interval_sec: secondsSetting(record.ping_record_persist_interval_sec, '120', 60, 3600),
     live_poll_active_interval_sec: secondsSetting(record.live_poll_active_interval_sec, '3', 3, 300),
     live_poll_idle_interval_sec: secondsSetting(record.live_poll_idle_interval_sec, '120', 60, 3600),

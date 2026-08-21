@@ -5,7 +5,7 @@ import { Download, RotateCcw, Save, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import Loading from '../../components/Loading';
 import { useApi } from '../../contexts/AuthContext';
-import { SettingCard, SettingInput } from '../../components/admin/SettingCard';
+import { SettingCard, SettingInput, SettingTextarea, SettingToggle } from '../../components/admin/SettingCard';
 import { getChangedSettings, type SettingsMap } from '../../utils/settingsDiff';
 import { requestPassword } from '../../utils/reauth';
 import { notifyPublicDataUpdated } from '../../utils/publicDataEvents';
@@ -248,6 +248,26 @@ export default function SettingsSite() {
             </Flex>
           </Flex>
         </Box>
+        <Box style={{ marginBottom: 12 }}>
+          <Text size="2" weight="medium" style={{ display: 'block', marginBottom: 4 }}>默认节点视图</Text>
+          <Text size="1" color="gray" style={{ display: 'block', marginBottom: 6 }}>
+            游客首次打开首页时使用卡片或表格；用户切换后会记住自己的选择。
+          </Text>
+          <select
+            className="admin-setting-select"
+            value={settings.default_view_mode || 'grid'}
+            onChange={(event) => updateSetting('default_view_mode', event.target.value)}
+          >
+            <option value="grid">卡片视图</option>
+            <option value="table">表格视图</option>
+          </select>
+        </Box>
+        <SettingToggle
+          label="未登录时隐藏后台入口"
+          description="隐藏首页右上角的后台按钮；仍可直接访问后台登录地址"
+          checked={settings.hide_admin_entry_when_logged_out === 'true'}
+          onCheckedChange={(checked) => updateSetting('hide_admin_entry_when_logged_out', checked ? 'true' : 'false')}
+        />
         <SettingInput
           label="站点标题"
           description="显示在导航栏和浏览器标签页"
@@ -283,6 +303,68 @@ export default function SettingsSite() {
           onChange={(value) => updateSetting('script_domain', value)}
           placeholder={window.location.origin}
         />
+      </SettingCard>
+
+      <SettingCard title="Emerald 首页功能" description="地图、地球、公告及节点展示设置" defaultOpen>
+        <Box style={{ marginBottom: 12 }}>
+          <Text size="2" weight="medium" style={{ display: 'block', marginBottom: 4 }}>默认全球视图</Text>
+          <Text size="1" color="gray" style={{ display: 'block', marginBottom: 6 }}>
+            游客首次打开首页时使用的视图；用户切换后会记住自己的选择。
+          </Text>
+          <select
+            className="admin-setting-select"
+            value={settings.earth_view_mode || 'maps'}
+            onChange={(event) => updateSetting('earth_view_mode', event.target.value)}
+          >
+            <option value="maps">世界地图</option>
+            <option value="earth">自动旋转地球</option>
+            <option value="earth-stop">静止地球</option>
+            <option value="cards">地区卡片</option>
+            <option value="hide">隐藏全球视图</option>
+          </select>
+        </Box>
+        <SettingToggle
+          label="显示访客位置"
+          description="在地球视图中显示访客国家，并绘制访客与节点的连线"
+          checked={settings.visitor_info_card_enabled !== 'false'}
+          onCheckedChange={(checked) => updateSetting('visitor_info_card_enabled', checked ? 'true' : 'false')}
+        />
+        <SettingToggle
+          label="离线节点置后"
+          description="首页节点列表中将离线节点放到在线节点之后"
+          checked={settings.offline_nodes_last === 'true'}
+          onCheckedChange={(checked) => updateSetting('offline_nodes_last', checked ? 'true' : 'false')}
+        />
+        <SettingToggle
+          label="关闭页面动画"
+          description="减少低性能设备上的过渡和装饰动画"
+          checked={settings.disable_page_animation === 'true'}
+          onCheckedChange={(checked) => updateSetting('disable_page_animation', checked ? 'true' : 'false')}
+        />
+        <SettingToggle
+          label="显示首页公告"
+          description="在节点统计卡片下方显示一条公告"
+          checked={settings.alert_enabled === 'true'}
+          onCheckedChange={(checked) => updateSetting('alert_enabled', checked ? 'true' : 'false')}
+        />
+        {settings.alert_enabled === 'true' && (
+          <>
+            <SettingInput
+              label="公告标题"
+              value={settings.alert_title || ''}
+              onChange={(value) => updateSetting('alert_title', value)}
+              placeholder="公告"
+            />
+            <SettingTextarea
+              label="公告内容"
+              description="支持换行，最多 8192 个字符"
+              value={settings.alert_content || ''}
+              onChange={(value) => updateSetting('alert_content', value)}
+              rows={5}
+              placeholder="请输入首页公告内容"
+            />
+          </>
+        )}
       </SettingCard>
 
       <SettingCard title="备份与恢复" description="导出或导入系统配置" defaultOpen>

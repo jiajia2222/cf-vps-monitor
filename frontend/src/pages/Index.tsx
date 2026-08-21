@@ -15,7 +15,9 @@ import { clearCachedPublicBootstrap, fetchPublicBootstrap, getCachedPublicBootst
 import { mergePublicClientPatch, normalizePublicClients } from '../utils/publicClients';
 import { fetchWithBootstrapRetry } from '../utils/api';
 import { getLocalStorageItem } from '../utils/browserStorage';
+import { fetchPublicSettings, type PublicSettings } from '../utils/publicSettings';
 import WebsiteMonitorList, { WebsiteMonitorSummary } from '../components/WebsiteMonitorList';
+import EmeraldOverview from '../components/EmeraldOverview';
 import { subscribeWebsiteMonitorsUpdated, type WebsiteMonitorsUpdateDetail } from '../utils/websiteMonitorEvents';
 import { notifyPublicDataReady, subscribePublicDataUpdated } from '../utils/publicDataEvents';
 import type { PublicDataUpdateDetail } from '../utils/publicDataEvents';
@@ -240,14 +242,29 @@ export default function Index() {
   const [websites, setWebsites] = useState<WebsiteMonitorSummary[]>([]);
   const [websitesLoading, setWebsitesLoading] = useState(monitorMode === 'websites' && websites.length === 0);
   const [websitesError, setWebsitesError] = useState<string | null>(null);
+  const [publicSettings, setPublicSettings] = useState<PublicSettings | null>(null);
   const [websitePeriodHours, setWebsitePeriodHours] = useState(24);
   const offlinePosition = useMemo(loadOfflinePosition, []);
+  const effectiveOfflinePosition: OfflinePosition = publicSettings?.offline_nodes_last === 'true' ? 'last' : offlinePosition;
 
   const handleWebsitePeriodChange = (hours: number) => {
     if (hours === websitePeriodHours) return;
     setWebsitesLoading(true);
     setWebsitePeriodHours(hours);
   };
+
+  useEffect(() => {
+    if (monitorMode !== 'servers') return undefined;
+    let cancelled = false;
+    fetchPublicSettings()
+      .then((settings) => {
+        if (!cancelled) setPublicSettings(settings);
+      })
+      .catch(() => {
+        // 首页主体数据仍可正常显示；公共设置失败时使用组件默认值。
+      });
+    return () => { cancelled = true; };
+  }, [monitorMode]);
 
   // Load client list
   useEffect(() => {
@@ -425,16 +442,16 @@ export default function Index() {
 
   // Apply offline server position sorting
   const sortedClients = useMemo(() => {
-    if (offlinePosition === 'keep') return displayClients;
+    if (effectiveOfflinePosition === 'keep') return displayClients;
     const onlineSet = liveMap.online;
     return [...displayClients].sort((a, b) => {
       const aOnline = onlineSet.includes(a.uuid);
       const bOnline = onlineSet.includes(b.uuid);
       if (aOnline === bOnline) return 0;
-      if (offlinePosition === 'first') return aOnline ? 1 : -1;
+      if (effectiveOfflinePosition === 'first') return aOnline ? 1 : -1;
       return aOnline ? -1 : 1;
     });
-  }, [displayClients, offlinePosition, liveMap.online]);
+  }, [displayClients, effectiveOfflinePosition, liveMap.online]);
 
   const apiError = !clientsLoading && displayClients.length === 0 ? (clientsError || error) : null;
 
@@ -475,6 +492,24 @@ export default function Index() {
         </section>
       )}
 
+      {monitorMode === 'servers' && publicSettings?.alert_enabled === 'true' && publicSettings.alert_content.trim() && (
+        <section className="emerald-alert" role="status">
+          <Text className="emerald-alert-title" size="3" weight="bold">
+            {publicSettings.alert_title.trim() || '公告'}
+          </Text>
+          <div className="emerald-alert-content">{publicSettings.alert_content}</div>
+        </section>
+      )}
+
+      {monitorMode === 'servers' && (
+        <EmeraldOverview
+          nodes={displayClients}
+          liveData={liveMap}
+          defaultMode={publicSettings?.earth_view_mode}
+          visitorEnabled={publicSettings?.visitor_info_card_enabled !== 'false'}
+        />
+      )}
+
       {apiError && <ApiUnavailableNotice error={apiError} />}
 
       {monitorMode === 'servers' ? (
@@ -483,8 +518,9 @@ export default function Index() {
             nodes={sortedClients}
             liveData={liveMap}
             gridRenderer={renderGrid}
-            offlinePosition={offlinePosition}
+            offlinePosition={effectiveOfflinePosition}
             includeHidden={isAuthenticated}
+            defaultViewMode={publicSettings?.default_view_mode}
           />
         </React.Suspense>
       ) : (

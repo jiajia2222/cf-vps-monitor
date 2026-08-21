@@ -66,6 +66,55 @@ export const SETTING_SCHEMA = {
     public: true,
     maxLength: 256,
   },
+  default_view_mode: {
+    type: 'enum',
+    defaultValue: 'grid',
+    public: true,
+    values: ['grid', 'table'],
+  },
+  hide_admin_entry_when_logged_out: {
+    type: 'boolean',
+    defaultValue: 'false',
+    public: true,
+  },
+  alert_enabled: {
+    type: 'boolean',
+    defaultValue: 'false',
+    public: true,
+  },
+  alert_title: {
+    type: 'string',
+    defaultValue: '',
+    public: true,
+    maxLength: 128,
+  },
+  alert_content: {
+    type: 'string',
+    defaultValue: '',
+    public: true,
+    maxLength: 8192,
+  },
+  earth_view_mode: {
+    type: 'enum',
+    defaultValue: 'maps',
+    public: true,
+    values: ['earth', 'earth-stop', 'maps', 'cards', 'hide'],
+  },
+  visitor_info_card_enabled: {
+    type: 'boolean',
+    defaultValue: 'true',
+    public: true,
+  },
+  offline_nodes_last: {
+    type: 'boolean',
+    defaultValue: 'false',
+    public: true,
+  },
+  disable_page_animation: {
+    type: 'boolean',
+    defaultValue: 'false',
+    public: true,
+  },
   site_logo_data: {
     type: 'string',
     defaultValue: '',

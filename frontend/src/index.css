@@ -6238,3 +6238,323 @@ html[data-monitor-theme='aurora'] .nav-logo-mark {
   border-radius: 8px;
   background: var(--gray-a2);
 }
+
+/* Emerald dashboard visual layer */
+.emerald-overview {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent-7), transparent 45%);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, #10b981, transparent 84%), transparent 34%),
+    color-mix(in srgb, var(--color-panel), var(--accent-2) 22%);
+  overflow: hidden;
+}
+
+.emerald-overview-header {
+  margin-bottom: 12px;
+}
+
+.emerald-overview-kicker {
+  margin-bottom: 3px;
+  color: #10b981;
+  font: 700 11px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .16em;
+}
+
+.emerald-overview-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 5px;
+  color: var(--gray-10);
+  font-size: 12px;
+}
+
+.emerald-overview-summary .is-online,
+.emerald-region-meta .is-online {
+  color: #10b981;
+}
+
+.emerald-overview-summary .is-offline,
+.emerald-region-meta .is-offline {
+  color: #f59e0b;
+}
+
+.emerald-overview-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.emerald-overview-modes button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--gray-a6);
+  border-radius: 7px;
+  background: var(--gray-a2);
+  color: var(--gray-11);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.emerald-overview-modes button:hover,
+.emerald-overview-modes button.active {
+  border-color: #10b981;
+  background: #10b981;
+  color: #03251b;
+}
+
+.emerald-overview-content {
+  min-height: 120px;
+}
+
+.emerald-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.emerald-metric-card {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-a5);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--color-panel), transparent 20%);
+}
+
+.emerald-metric-card > span {
+  display: block;
+  overflow: hidden;
+  color: var(--gray-9);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emerald-metric-card .emerald-metric-label {
+  margin-bottom: 5px;
+  color: var(--gray-10);
+  font-size: 12px;
+}
+
+.emerald-metric-card strong {
+  display: block;
+  overflow: hidden;
+  color: var(--gray-12);
+  font-size: 14px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emerald-finance-card strong {
+  color: #fbbf24;
+}
+
+.emerald-map-wrap {
+  position: relative;
+  width: 100%;
+  height: min(48vw, 430px);
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, #064e3b, transparent 72%);
+}
+
+.emerald-map-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.emerald-overview-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  color: var(--gray-10);
+  font-size: 13px;
+  text-align: center;
+}
+
+.emerald-globe-wrap {
+  position: relative;
+  width: min(100%, 620px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.emerald-globe-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.emerald-globe-canvas:active {
+  cursor: grabbing;
+}
+
+.emerald-globe-visitor,
+.emerald-visitor-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--gray-10);
+  font-size: 12px;
+}
+
+.emerald-globe-visitor {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 5px 8px;
+  border: 1px solid var(--gray-a6);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-panel), transparent 15%);
+  backdrop-filter: blur(8px);
+}
+
+.emerald-visitor-note {
+  margin-top: 8px;
+  color: #10b981;
+}
+
+.emerald-visitor-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--gray-a5);
+  color: var(--gray-10);
+  font-size: 12px;
+}
+
+.emerald-visitor-card > div {
+  display: grid;
+  gap: 2px;
+  margin-right: auto;
+}
+
+.emerald-visitor-card strong {
+  color: var(--gray-12);
+  font-size: 13px;
+}
+
+.emerald-region-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.emerald-region-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--gray-a6);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-panel), var(--accent-2) 20%);
+}
+
+.emerald-region-code {
+  color: var(--gray-9);
+  font: 700 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .08em;
+}
+
+.emerald-region-total {
+  margin: 12px 0 4px;
+  color: var(--gray-12);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.emerald-region-total span {
+  color: var(--gray-9);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.emerald-region-meta {
+  font-size: 12px;
+}
+
+.emerald-region-traffic {
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--gray-10);
+  font: 11px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emerald-alert {
+  margin: 0 0 16px;
+  padding: 13px 16px;
+  border: 1px solid color-mix(in srgb, #f59e0b, transparent 35%);
+  border-radius: 10px;
+  background: color-mix(in srgb, #f59e0b, transparent 90%);
+}
+
+.emerald-alert-title {
+  display: block;
+  color: #f59e0b;
+}
+
+.emerald-alert-content {
+  margin-top: 5px;
+  color: var(--gray-11);
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.admin-setting-select {
+  width: min(420px, 100%);
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--gray-a7);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--gray-12);
+  font: inherit;
+}
+
+.disable-page-animation *,
+.disable-page-animation *::before,
+.disable-page-animation *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (max-width: 640px) {
+  .emerald-overview {
+    padding: 14px;
+  }
+
+  .emerald-map-wrap {
+    height: 72vw;
+    min-height: 230px;
+  }
+
+  .emerald-overview-modes {
+    width: 100%;
+  }
+
+  .emerald-overview-modes button {
+    flex: 1;
+    justify-content: center;
+  }
+}
